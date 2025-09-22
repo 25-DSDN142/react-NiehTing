@@ -18,15 +18,34 @@ function drawInteraction(faces, hands) {
     let indexFingerTipX = hand.index_finger_tip.x;
     let indexFingerTipY = hand.index_finger_tip.y;
 
+    let middleFingerTipX = hand.middle_finger_tip.x;
+    let middleFingerTipY = hand.middle_finger_tip.y;
+
+    let ringFingerTipX = hand.ring_finger_tip.x;
+    let ringFingerTipY = hand.ring_finger_tip.y;
+
+    let pinkyFingerTipX = hand.pinky_finger_tip.x;
+    let pinkyFingerTipY = hand.pinky_finger_tip.y;
+
+    let thumbTipX = hand.thumb_tip.x;
+    let thumbTipY = hand.thumb_tip.y;
+
     //  let pinkyFingerTipX = hand.pinky_finger_tip.x;
     //  let pinkyFingerTipY = hand.pinky_finger_tip.y;
 
     /*
     Start drawing on the hands here
     */
-
+    fill(225, 255, 0);
+    ellipse(thumbTipX, thumbTipY, 30, 30);
     fill(225, 225, 0);
     ellipse(indexFingerTipX, indexFingerTipY, 30, 30);
+    fill(225, 195, 20);
+    ellipse(middleFingerTipX, middleFingerTipY, 30, 30);
+    fill(225, 165, 20);
+    ellipse(ringFingerTipX, ringFingerTipY, 30, 30);
+    fill(225, 135, 20);
+    ellipse(pinkyFingerTipX, pinkyFingerTipY, 30, 30);
 
     // drawPoints(hand)
 
