@@ -82,7 +82,7 @@ function drawInteraction(faces, hands) {
 
     // drawX(noseTipX,noseTipY); 
 
-    // drawX(face.keypoints[332].x,face.keypoints[332].y);
+    drawX(face.keypoints[332].x,face.keypoints[332].y);
     // drawX(face.keypoints[103].x,face.keypoints[103].y);
 
 

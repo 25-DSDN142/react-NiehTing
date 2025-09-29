@@ -5,6 +5,7 @@ function prepareInteraction() {
 }
 
 function drawInteraction(faces, hands) {
+  background(81, 166, 160);
   // hands part
   // for loop to capture if there is more than one hand on the screen. This applies the same process to all hands.
   for (let i = 0; i < hands.length; i++) {
@@ -36,22 +37,14 @@ function drawInteraction(faces, hands) {
     /*
     Start drawing on the hands here
     */
-    fill(225, 255, 0);
-    ellipse(thumbTipX, thumbTipY, 30, 30);
-    fill(225, 225, 0);
-    ellipse(indexFingerTipX, indexFingerTipY, 30, 30);
-    fill(225, 195, 20);
-    ellipse(middleFingerTipX, middleFingerTipY, 30, 30);
-    fill(225, 165, 20);
-    ellipse(ringFingerTipX, ringFingerTipY, 30, 30);
-    fill(225, 135, 20);
-    ellipse(pinkyFingerTipX, pinkyFingerTipY, 30, 30);
+   
+  
 
     // drawPoints(hand)
 
     //fingerPuppet(indexFingerTipX, indexFingerTipY);
 
-    //chameleonHandPuppet(hand)
+    chameleonHandPuppet(hand)
 
     /*
     Stop drawing on the hands here
@@ -101,7 +94,7 @@ function chameleonHandPuppet(hand) {
   // Find the index finger tip and thumb tip
   // let finger = hand.index_finger_tip;
 
-  let finger = hand.middle_finger_tip; // this finger now contains the x and y infomation! you can access it by using finger.x 
+  let finger = hand.pinky_finger_tip; // this finger now contains the x and y infomation! you can access it by using finger.x 
   let thumb = hand.thumb_tip;
 
   // Draw circles at finger positions
@@ -110,16 +103,19 @@ function chameleonHandPuppet(hand) {
   // Calculate the pinch "distance" between finger and thumb
   let pinch = dist(finger.x, finger.y, thumb.x, thumb.y);
 
+  ellipse(640, 500, 200, pinch);
+
   // This circle's size is controlled by a "pinch" gesture
-  fill(0, 255, 0, 200);
+  fill(255);
   stroke(0);
   strokeWeight(2);
   circle(centerX, centerY, pinch);
 
-  let indexFingerTipX = hand.index_finger_tip.x;
-  let indexFingerTipY = hand.index_finger_tip.y;
+
+  let middleFingerTipX = hand.middle_finger_tip.x;
+  let middleFingerTipY = hand.middle_finger_tip.y;
   fill(0)
-  circle(indexFingerTipX, indexFingerTipY, 20);
+  circle(middleFingerTipX, middleFingerTipY, 20);
 
 }
 
