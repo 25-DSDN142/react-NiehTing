@@ -38,13 +38,13 @@ function drawInteraction(faces, hands) {
     Start drawing on the hands here
     */
    
-  
+
+    chameleonHandPuppet(hand);
+
 
     // drawPoints(hand)
 
     //fingerPuppet(indexFingerTipX, indexFingerTipY);
-
-    chameleonHandPuppet(hand)
 
     /*
     Stop drawing on the hands here
@@ -60,6 +60,7 @@ function drawInteraction(faces, hands) {
 
 
 function fingerPuppet(x, y) {
+
   fill(255, 38, 219) // pink
   ellipse(x, y, 100, 20)
   ellipse(x, y, 20, 100)
@@ -81,28 +82,47 @@ function pinchCircle(hand) { // adapted from https://editor.p5js.org/ml5/sketche
   let centerY = (finger.y + thumb.y) / 2;
   // Calculate the pinch "distance" between finger and thumb
   let pinch = dist(finger.x, finger.y, thumb.x, thumb.y);
-
   // This circle's size is controlled by a "pinch" gesture
   fill(0, 255, 0, 200);
   stroke(0);
   strokeWeight(2);
   circle(centerX, centerY, pinch);
-
+  
 }
 
 function chameleonHandPuppet(hand) {
   // Find the index finger tip and thumb tip
   // let finger = hand.index_finger_tip;
-
   let finger = hand.pinky_finger_tip; // this finger now contains the x and y infomation! you can access it by using finger.x 
   let thumb = hand.thumb_tip;
-
+  
   // Draw circles at finger positions
   let centerX = (finger.x + thumb.x) / 2;
   let centerY = (finger.y + thumb.y) / 2;
   // Calculate the pinch "distance" between finger and thumb
   let pinch = dist(finger.x, finger.y, thumb.x, thumb.y);
+  // console.log(pinch);
 
+  fill(252, 127, 3)
+  //FishLimbs
+  const finThreshold = 150;
+  if(pinch > finThreshold){
+  quad(840, 450, 980, 270, 960, 530, 840, 550);
+  quad(440, 450, 300, 270, 320, 530, 440, 550);
+  quad(640, 400, 640, 120, 750, 50, 750, 200);
+  } 
+  else{
+  quad(840, 450, 920, 350, 920, 450, 840, 550);
+  quad(440, 450, 360, 350, 360, 450, 440, 550);
+  quad(640, 400, 640, 120, 530, 50, 530, 200);
+  }
+  //FishBody
+  circle(640, 400, 500);
+  fill(252, 152, 3);
+  strokeWeight(0);
+  rect(615, 160, 50, 120, 20);
+
+  fill(0)
   ellipse(640, 500, 200, pinch);
 
   // This circle's size is controlled by a "pinch" gesture
@@ -111,12 +131,11 @@ function chameleonHandPuppet(hand) {
   strokeWeight(2);
   circle(centerX, centerY, pinch);
 
-
   let middleFingerTipX = hand.middle_finger_tip.x;
   let middleFingerTipY = hand.middle_finger_tip.y;
   fill(0)
   circle(middleFingerTipX, middleFingerTipY, 20);
-
+  
 }
 
 function drawConnections(hand) {
