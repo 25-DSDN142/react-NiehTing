@@ -50,9 +50,12 @@ function drawInteraction(faces, hands) {
     } else if (imgAlpha > fadeTarget) {
       imgAlpha = max(fadeTarget, imgAlpha - fadeSpeed);
     } else {
-      fadeHoldFrames = int(random(30, 120));
-      fadeTarget = random() < 0.5 ? 0 : 255;
-      fadeSpeed = random(1, 5);
+      // Bias towards invisible (0 alpha) and hold it longer to make shark appear less often
+      const show = random() < 0.33; // 15% chance to aim for visible
+      fadeTarget = show ? 255 : 0;
+      fadeHoldFrames = show ? int(random(20, 80)) : int(random(120, 360));
+      // Slightly faster visible fades, normal hidden fades
+      fadeSpeed = show ? random(1.5, 3.5) : random(1, 4);
     }
   }
 
@@ -96,8 +99,7 @@ function drawInteraction(faces, hands) {
     Start drawing on the hands here
     */
     
-    //Draw Water rays beneath water (random)
-    //Shark
+
     drawFishEyeFromHand(hand);
 
 
@@ -122,7 +124,7 @@ function drawInteraction(faces, hands) {
     rayStates = new Array(rays.length).fill(0).map(() => ({
       alpha: random(0, 255),
       target: random() < 0.5 ? 0 : 255,
-      speed: random(1, 5),
+      speed: random(1, 2),
       hold: int(random(0, 60))
     }));
   }
