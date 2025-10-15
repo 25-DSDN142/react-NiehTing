@@ -1,13 +1,74 @@
 // ----=  HANDS  =----
 /* load images here */
+let myImage;
+let imageRequested = false;
+let imgAlpha = 0;
+let fadeTarget = 255;
+let fadeSpeed = 2;
+let fadeHoldFrames = 0;
+let rayStates = [];
 function prepareInteraction() {
-  //bgImage = loadImage('/images/background.png');
+  // Try to load shark; fallback to a known image if missing
+  imageRequested = true;
+  loadImage('images/shark.png',
+    img => { myImage = img; },
+    () => {
+      console.warn('images/shark.png not found; falling back to images/background.png');
+      loadImage('images/background.png', img2 => { myImage = img2; });
+    }
+  );
 }
 
 function drawInteraction(faces, hands) {
+  //Ocean
   background(81, 166, 160);
-  // hands part
-  // for loop to capture if there is more than one hand on the screen. This applies the same process to all hands.
+  strokeWeight(0)
+  fill(70, 145, 140);
+  rect(0, 40, 1280, 640);
+  fill(60, 122, 118);
+  rect(0, 125, 1280, 640);
+  fill(49, 99, 96);
+  rect(0, 300, 1280, 640);
+
+  // Ensure image is requested even if prepareInteraction wasn't called due to script order
+  if (!myImage && !imageRequested) {
+    imageRequested = true;
+    loadImage('images/shark.png',
+      img => { myImage = img; },
+      () => {
+        loadImage('images/background.png', img2 => { myImage = img2; });
+      }
+    );
+  }
+
+  // Random fade in/out state update
+  if (fadeHoldFrames > 0) {
+    fadeHoldFrames--;
+  } else {
+    if (imgAlpha < fadeTarget) {
+      imgAlpha = min(fadeTarget, imgAlpha + fadeSpeed);
+    } else if (imgAlpha > fadeTarget) {
+      imgAlpha = max(fadeTarget, imgAlpha - fadeSpeed);
+    } else {
+      fadeHoldFrames = int(random(30, 120));
+      fadeTarget = random() < 0.5 ? 0 : 255;
+      fadeSpeed = random(1, 5);
+    }
+  }
+
+  // Draw image with fading alpha
+  if (myImage) {
+    push();
+    tint(255, imgAlpha);
+    image(myImage, 940, 100, 300, 300);
+    noTint();
+    pop();
+  }
+
+  if (hands.length > 0) {
+    drawFishBodyFromHand(hands[0]);
+  }
+  
   for (let i = 0; i < hands.length; i++) {
     let hand = hands[i];
     //console.log(hand);
@@ -31,20 +92,14 @@ function drawInteraction(faces, hands) {
     let thumbTipX = hand.thumb_tip.x;
     let thumbTipY = hand.thumb_tip.y;
 
-    //  let pinkyFingerTipX = hand.pinky_finger_tip.x;
-    //  let pinkyFingerTipY = hand.pinky_finger_tip.y;
-
     /*
     Start drawing on the hands here
     */
-   
+    
+    //Draw Water rays beneath water (random)
+    //Shark
+    drawFishEyeFromHand(hand);
 
-    chameleonHandPuppet(hand);
-
-
-    // drawPoints(hand)
-
-    //fingerPuppet(indexFingerTipX, indexFingerTipY);
 
     /*
     Stop drawing on the hands here
@@ -52,90 +107,89 @@ function drawInteraction(faces, hands) {
   }
   // You can make addtional elements here, but keep the hand drawing inside the for loop. 
   //------------------------------------------------------
-}
-
-
-
-
-
-
-function fingerPuppet(x, y) {
-
-  fill(255, 38, 219) // pink
-  ellipse(x, y, 100, 20)
-  ellipse(x, y, 20, 100)
-
-  fill(255, 252, 48) // yellow
-  ellipse(x, y, 20) // draw center 
-
-}
-
-
-function pinchCircle(hand) { // adapted from https://editor.p5js.org/ml5/sketches/DNbSiIYKB
-  // Find the index finger tip and thumb tip
-  let finger = hand.index_finger_tip;
-  //let finger = hand.pinky_finger_tip;
-  let thumb = hand.thumb_tip;
-
-  // Draw circles at finger positions
-  let centerX = (finger.x + thumb.x) / 2;
-  let centerY = (finger.y + thumb.y) / 2;
-  // Calculate the pinch "distance" between finger and thumb
-  let pinch = dist(finger.x, finger.y, thumb.x, thumb.y);
-  // This circle's size is controlled by a "pinch" gesture
-  fill(0, 255, 0, 200);
-  stroke(0);
-  strokeWeight(2);
-  circle(centerX, centerY, pinch);
-  
-}
-
-function chameleonHandPuppet(hand) {
-  // Find the index finger tip and thumb tip
-  // let finger = hand.index_finger_tip;
-  let finger = hand.pinky_finger_tip; // this finger now contains the x and y infomation! you can access it by using finger.x 
-  let thumb = hand.thumb_tip;
-  
-  // Draw circles at finger positions
-  let centerX = (finger.x + thumb.x) / 2;
-  let centerY = (finger.y + thumb.y) / 2;
-  // Calculate the pinch "distance" between finger and thumb
-  let pinch = dist(finger.x, finger.y, thumb.x, thumb.y);
-  // console.log(pinch);
-
-  fill(252, 127, 3)
-  //FishLimbs
-  const finThreshold = 150;
-  if(pinch > finThreshold){
-  quad(840, 450, 980, 270, 960, 530, 840, 550);
-  quad(440, 450, 300, 270, 320, 530, 440, 550);
-  quad(640, 400, 640, 120, 750, 50, 750, 200);
-  } 
-  else{
-  quad(840, 450, 920, 350, 920, 450, 840, 550);
-  quad(440, 450, 360, 350, 360, 450, 440, 550);
-  quad(640, 400, 640, 120, 530, 50, 530, 200);
+  push();
+  noStroke();
+  rotate(QUARTER_PI-50);
+  const rays = [
+    [-80, -0, 350, 40],
+    [0, -300, 300, 10],
+    [0, -200, 200, 20],
+    [400, -1050, 300, 30],
+    [300, -650, 300, 20],
+  ];
+  // initialize per-ray fade state if needed
+  if (rayStates.length !== rays.length) {
+    rayStates = new Array(rays.length).fill(0).map(() => ({
+      alpha: random(0, 255),
+      target: random() < 0.5 ? 0 : 255,
+      speed: random(1, 5),
+      hold: int(random(0, 60))
+    }));
   }
-  //FishBody
+  for (let i = 0; i < rays.length; i++) {
+    const s = rayStates[i];
+    // update independent fade per ray
+    if (s.hold > 0) s.hold--; 
+    else if (s.alpha < s.target) s.alpha = min(s.target, s.alpha + s.speed);
+    else if (s.alpha > s.target) s.alpha = max(s.target, s.alpha - s.speed);
+    else { s.hold = int(random(20, 100)); s.target = random() < 0.5 ? 0 : 255; s.speed = random(1, 5); }
+
+    const [x, y, w, h] = rays[i];
+    fill(255, s.alpha);
+    rect(x, y, w, h, 40);
+  }
+  pop();
+}
+
+function drawFishBodyFromHand(hand) {
+  // Determine pinch and draw fins/body once
+  let finger = hand.pinky_finger_tip;
+  let thumb = hand.thumb_tip;
+  
+  let centerX = (finger.x + thumb.x) / 2;
+  let centerY = (finger.y + thumb.y) / 2;
+  let pinch = dist(finger.x, finger.y, thumb.x, thumb.y);
+
+  //Fish Fins
+  fill(252, 127, 3);
+  const finThreshold = 150;
+  if (pinch > finThreshold) {
+    quad(840, 450, 980, 270, 960, 530, 840, 550);
+    quad(440, 450, 300, 270, 320, 530, 440, 550);
+    quad(640, 400, 640, 120, 750, 50, 750, 200);
+  } else {
+    quad(840, 450, 920, 350, 920, 450, 840, 550);
+    quad(440, 450, 360, 350, 360, 450, 440, 550);
+    quad(640, 400, 640, 120, 530, 50, 530, 200);
+  }
+  // Fish body
   circle(640, 400, 500);
   fill(252, 152, 3);
   strokeWeight(0);
   rect(615, 160, 50, 120, 20);
 
-  fill(0)
+  fill(0);
   ellipse(640, 500, 200, pinch);
+}
 
-  // This circle's size is controlled by a "pinch" gesture
+function drawFishEyeFromHand(hand) {
+  // Use pinch to size the white eyeball and middle finger for the pupil
+  let finger = hand.pinky_finger_tip;
+  let thumb = hand.thumb_tip;
+
+  let centerX = (finger.x + thumb.x) / 2;
+  let centerY = (finger.y + thumb.y) / 2;
+  let pinch = dist(finger.x, finger.y, thumb.x, thumb.y);
+
   fill(255);
   stroke(0);
-  strokeWeight(2);
+  strokeWeight(0);
   circle(centerX, centerY, pinch);
 
   let middleFingerTipX = hand.middle_finger_tip.x;
   let middleFingerTipY = hand.middle_finger_tip.y;
   fill(0)
   circle(middleFingerTipX, middleFingerTipY, 20);
-  
 }
 
 function drawConnections(hand) {
